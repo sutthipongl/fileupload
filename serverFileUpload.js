@@ -1,6 +1,6 @@
 const express = require('express');
 const formidable = require('formidable');
-
+const moment = require('moment');
 const app = express();
 
 app.use((req,res,next) => {
@@ -28,7 +28,35 @@ app.post('/upload', (req, res, next) => {
         res.send(`${file.name} is uploaded`);
     });
 
+    next();
 
+});
+
+app.post('/savetext', (req, res, next) => {
+
+    const form = formidable({ multiples: true });
+
+    form.parse(req, (err, fields, files) => {
+
+        if (err) {
+            next(err);
+            return;
+        }
+
+        var fs = require("fs");
+
+        const filename = "textFile"+moment().format('YYYYMMDDhmmss')+".txt";
+
+        var writeStream = fs.createWriteStream("./public/uploads/"+filename);
+        writeStream.write(fields.textdata);
+        writeStream.end();
+
+        res.send('/uploads/'+filename);
+
+    });
+
+
+    next();
 
 });
 
